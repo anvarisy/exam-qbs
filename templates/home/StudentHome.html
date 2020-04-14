@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="icon" href="{% static '../../media/img/tulip.png' %}">
+</head>
+<body>
+{% include 'components/student-navs.html' %}
+
+<div class="modal fade" id="modalUpload" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Choose Your File</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'post-task-student' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="modal-body">
+
+                 <div class="form-group">
+                        <label for="Teacher">Key</label>
+                        <input type="text" class="form-control" id="key" name="key">
+                 </div>
+
+                    <div class="form-group">
+                        <label for="Teacher">Answer</label>
+                        <input type="file" class="form-control" id="Question" name="answer">
+                    </div>
+
+            </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Done</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered" style="margin-top: 25px; margin-left: auto;margin-right: auto">
+    <thead>
+    <tr>
+        <th scope="col">Subject</th>
+        <th scope="col">Grade</th>
+        <th scope="col">Teacher</th>
+        <th scope="col">Question</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for key, val in data.items %}
+        <tr>
+            <td>{{ val.Subject }}</td>
+            <td>{{ val.Grade }}</td>
+            <td>{{ val.Teacher }}</td>
+            <td><a href="{{ val.Question }}" class="btn btn-link">Link</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<table class="table table-bordered" style="margin-top: 25px; margin-left: auto;margin-right: auto">
+    <thead>
+    <tr>
+        <th scope="col">Subject</th>
+        <th scope="col">Status</th>
+        <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for key, val in task.items %}
+        <tr>
+            <td>{{ val.Mapel }}</td>
+            {% if val.Hasil == "#" %}
+                <td><img src="{% static 'img/x.png' %}" width="30px" height="30px"></td>
+            {% else %}
+                <td><img src="{% static 'img/ok.png' %}" width="30px" height="30px"></td>
+            {% endif %}
+            <td>
+                <button onclick="getKey('{{ key }}')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalUpload">
+                    Upload
+                </button>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+    function getKey(key) {
+        $("#key").val(key)
+    }
+</script>
+</body>
+</html>

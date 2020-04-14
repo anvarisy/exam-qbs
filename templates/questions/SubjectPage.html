@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Subject</title>
+    <script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="icon" href="{% static '../../media/img/tulip.png' %}">
+
+</head>
+<body>
+{% include 'components/teacher-navs.html' %}
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        {#        <th scope="col">#</th>#}
+        <th scope="col">Subject</th>
+        <th scope="col">Grade</th>
+        <th scope="col">Teacher</th>
+        <th scope="col">Question</th>
+        <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for key, val in data.items %}
+        <tr>
+            {#            <th scope="row">{{ key }}</th>#}
+            <td>{{ val.Subject }}</td>
+            <td>{{ val.Grade }}</td>
+            <td>{{ val.Teacher }}</td>
+            <td><a href="{{ val.Question }}" class="btn btn-link">Link</a></td>
+            <td>
+                <button onclick="deletes('{{ key }}')" type="button" class="btn btn-danger">Delete</button>
+            </td>
+
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<form style="margin-top: 50px; margin-left: 25%; margin-right: 25%" method="post" action="{% url 'post-subject' %}"
+      enctype="multipart/form-data">
+    {% csrf_token %}
+     <div class="form-group">
+        <label for="Subject">Subject</label>
+        <select name="subject" class="form-control">
+            <option value="Programming" class="form-control">Programming</option>
+            <option value="Bahasa Arab" class="form-control">Bahasa Arab</option>
+            <option value="QCB" class="form-control">QCB</option>
+            <option value="Matematika" class="form-control">Matematika</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Grade">Grade</label>
+        <select name="grade" class="form-control">
+            <option value="I" class="form-control">1</option>
+            <option value="II" class="form-control">2</option>
+            <option value="III" class="form-control">3</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Teacher">Teacher</label>
+        <input type="text" class="form-control" id="Teacher" name="teacher">
+    </div>
+
+    <div class="form-group">
+        <label for="Teacher">Question</label>
+        <input type="file" class="form-control" id="Question" name="question">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Creat New</button>
+</form>
+
+<script>
+
+
+    function deletes(id) {
+        let el = document.getElementsByName("csrfmiddlewaretoken");
+        let csrf_value = el[0].getAttribute("value");
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                location.reload()
+            }
+        };
+        xhttp.open("POST", "{% url 'delete-subject' %}", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("Key=" + id + "&csrfmiddlewaretoken=" + csrf_value);
+    }
+
+
+    function insert() {
+        let subject = $("#Lesson")
+        let grade = $("#Grade")
+        let teacher = $("#Teacher")
+        let question = $("#Question")
+        let ref = firebase.database().ref("Subject")
+        ref.once("value")
+            .then(function (snapshot) {
+                var key = snapshot.key; // "ada"
+                console.log(key)
+            });
+    }
+</script>
+
+</body>
+</html>

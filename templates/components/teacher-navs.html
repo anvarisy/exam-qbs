@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 25px">
+    <a class="navbar-brand" href="{% url 'teacher' %}">Examination</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'subject' %}">Input Soal</a>
+            </li>
+
+             <li class="nav-item">
+                <a class="nav-link" href="{% url 'teacher-obligation' %}">Obligasi</a>
+            </li>
+
+             <li class="nav-item">
+                <a class="nav-link" href="#">Check Laporan</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <a href="{% url 'logout' %}" style="margin-right: 10px" class="btn btn-outline-success my-2 my-sm-0"
+               type="submit">LOGOUT</a>
+        </form>
+    </div>
+</nav>
