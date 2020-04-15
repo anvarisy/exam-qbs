@@ -1,0 +1,178 @@
+{% load static %}
+{% csrf_token %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'components/RootHead.html' %}
+    <title>List Student</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #17a2b8;
+            height: 100vh;
+        }
+
+        #login .container #login-row #login-column #login-box {
+            margin-top: 120px;
+            max-width: 600px;
+            height: 320px;
+            border: 1px solid #9C9C9C;
+            background-color: #EAEAEA;
+        }
+
+        #login .container #login-row #login-column #login-box #login-form {
+            padding: 20px;
+        }
+
+        #login .container #login-row #login-column #login-box #login-form #register-link {
+            margin-top: -85px;
+        }
+    </style>
+</head>
+<body>
+{% include 'components/TeacherNav.html' %}
+<div id="login">
+    <div class="container">
+        <table class="table table-bordered" style="margin-top: 15px">
+            <thead>
+            <tr>
+                <th scope="col">Action</th>
+                <th scope="col">NIS</th>
+                <th scope="col">NAME</th>
+                <th scope="col">TASK</th>
+                <th scope="col">More</th>
+
+            </tr>
+            </thead>
+            <tbody id="student-task">
+
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Task For Student</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="subject-table" class="table table-bordered" style="margin-top: 15px">
+                    <thead>
+                    <tr>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Teacher</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="subject-content">
+                    {% for key, val in subjects.items %}
+                        <tr>
+                            <td>{{ val.Subject }}</td>
+                            <td>{{ val.Teacher }}</td>
+                            <td>
+                                <button onclick="add('{{ val.Subject }}','{{ val.URL }}')" class="button btn-success">Add</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+
+
+{% include 'components/RootFeet.html' %}
+<script>
+    let urls = '{% url 'teacher:load-json-student' %}'
+    let iHtml = ``
+    $.get(urls, {}, function (data) {
+        let id_student = Object.keys(data)
+        for (let i = 0; i < id_student.length; i++) {
+            let Data = data[id_student[i]]
+            let _id_student = id_student[i]
+            let _name_student = Data["Name"]
+            let key_result = Object.keys(Data["Task"])
+            console.log(key_result.length)
+            iHtml += `<tr>
+                    <td rowspan="${key_result.length}">
+                    <button data-toggle="modal" data-target="#staticBackdrop" onclick="edit('${_id_student}')" class="btn btn-success">Edit</button>
+                    </td>
+                    <td rowspan="${key_result.length}">${_id_student}</td>
+                    <td rowspan="${key_result.length}">${_name_student}</td>
+                    `
+            for (_i = 0; _i < key_result.length; _i++) {
+                try {
+                    let Result = Data["Task"][key_result[_i]]
+                    let _mapel = Result["Subject"]
+                    let _key_task = key_result[_i]
+                    console.log(_mapel)
+                    iHtml += `<td>${_mapel}</td>
+                                <td><button onclick="deleteTask('${_id_student}','${_key_task}')" class="button btn-danger">Delete</button></td>`
+                } catch (e) {
+                    iHtml += `<td></td>`
+                    iHtml += `<td></td>`
+                }
+                iHtml += `</tr><tr>`
+            }
+            iHtml += `</tr>`
+        }
+        $("#student-task").html(iHtml)
+
+    })
+
+    function edit(nis) {
+        location.hash = nis;
+    }
+
+    function add(subject, question) {
+        if (window.location.hash) {
+            let nis = window.location.hash.substring(1); //Puts hash in variable, and removes the # character
+            let el = document.getElementsByName("csrfmiddlewaretoken");
+            let csrf_value = el[0].getAttribute("value");
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    location.reload()
+                }
+            };
+            xhttp.open("POST", "{% url 'teacher:post-task-update' %}", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("nis=" + nis +"&subject="+subject+"&question="+question+"&csrfmiddlewaretoken=" + csrf_value);
+        } else {
+            alert("Select student to be add")
+        }
+    }
+
+    function deleteTask(nis, keytask){
+         if (confirm('Are you sure you want to delete this thing?')) {
+             let el = document.getElementsByName("csrfmiddlewaretoken");
+            let csrf_value = el[0].getAttribute("value");
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    location.reload()
+                }
+            };
+            xhttp.open("POST", "{% url 'teacher:post-task-delete' %}", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("nis=" + nis +"&keytask="+keytask+"&csrfmiddlewaretoken=" + csrf_value);
+         }else {
+
+         }
+    }
+</script>
+</body>
+</html>

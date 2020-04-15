@@ -1,41 +1,35 @@
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 
-from z import settings
-from .views.accounts import *
+from x import settings
 from .views.home import *
-from .views.questions import *
 from .views.teacher import *
 from .views.student import *
 
+urlpatterns = [
+    path('', ViewHomePage.as_view(), name='home'),
 
-urlpatterns =[
-    path('', ViewLandingPage.as_view(), name='home'),
-    path('logout', LogoutUser.as_view(), name='logout'),
-    path('admin-login', ViewAdminLogin.as_view(), name='admin-login'),
-    path('post-admin-login', PostAdminLogin.as_view(), name='post-admin-login'),
 
-    path('login', ViewLoginPage.as_view(), name='login'),
-    path('register', ViewRegisterPage.as_view(), name='register'),
-    path('student-register', InsertStudent.as_view(), name='student-register'),
-    path('student-login', PostLoginStudent.as_view(), name='student-login'),
+    path('teacher/', include(([
+        path('', ViewTeacherHome.as_view(), name='teacher'),
+        path('student-register', ViewStudentRegister.as_view(), name='student-register'),
+        path('post-student-register', PostStudentRegister.as_view(), name='post-student-register'),
+        path('student-list', ViewStudentList.as_view(), name='student-list'),
+        path('load-json-student', LoadJsonStudent.as_view(), name='load-json-student'),
+        path('post-delete-student', PostStudentDelete.as_view(), name='post-delete-student'),
+        path('subject-register', ViewSubject.as_view(), name='subject-register'),
+        path('post-subject-register', PostSubject.as_view(), name='post-subject-register'),
+        path('post-subject-delete', PostDeleteSubject.as_view(), name='post-subject-delete'),
+        path('post-task-update', PostUpdateTask.as_view(), name='post-task-update'),
+        path('post-task-delete', PostDeleteTask.as_view(), name='post-task-delete')
 
-    path('teacher-login', ViewTeacherLogin.as_view(), name='teacher-login'),
-    path('post-teacher-login', PostLoginTeacher.as_view(), name='post-teacher-login'),
-    path('teacher-register', ViewTeacherReg.as_view(), name='teacher-register'),
-    path('post-teacher-reg', PostTeacherReg.as_view(), name='post-teacher-reg'),
+    ], 'exam'), namespace='teacher')),
 
-    path('subject', ViewInputSubject.as_view(), name='subject'),
-    path('post-subject', InputNewSubject.as_view(), name='post-subject'),
-    path('delete-subject', DeleteSubject.as_view(), name='delete-subject'),
+    path('student/', include(([
+        path('', ViewStudentHome.as_view(), name='student'),
+    ], 'exam'), namespace='student')),
 
-    path('teacher', ViewTeacherHome.as_view(), name='teacher'),
-    path('teacher-obligation', ViewStudentObligation.as_view(), name='teacher-obligation'),
-    path('obligation-edit', ViewObligationEdit.as_view(), name='obligation-edit'),
-    path('obligation-delete',PostDeleteObligation.as_view(), name='obligation-delete'),
-    path('obligation-add', PostAddObligation.as_view(), name='obligation-add'),
-    path('student', ViewStudentHome.as_view(), name='student'),
-    path('json-student', JsonStudent.as_view(), name='json-student'),
-    path('post-task-student', PostUpdateTast.as_view(), name='post-task-student'),
-
+    path('account/', include(([
+        path('logout', LogoutAccount.as_view(), name='logout'),
+    ], 'exam'), namespace='account'))
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

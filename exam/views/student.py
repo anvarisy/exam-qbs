@@ -1,22 +1,12 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.files.storage import FileSystemStorage
-from django.shortcuts import redirect
+from django.shortcuts import render
 from django.views import View
 from firebase_admin import db
 
 
-class PostUpdateTast(PermissionRequiredMixin, View):
-    permission_required = 'exam.student_access'
-    login_url = 'login'
+class ViewStudentHome(View):
+    template_name = 'students/Student.html'
 
-    @staticmethod
-    def post(request):
-        key = request.POST['key']
-        answer = request.FILES['answer']
-        key_student = request.session['key-student']
-        fs = FileSystemStorage()
-        filename = fs.save(answer.name, answer)
-        url = fs.url(filename)
-        link = db.reference("Account").child("Student/"+key_student+"/Result/"+key)
-        link.update({'Hasil': url})
-        return redirect('student')
+    def get(self, request):
+        nis = request.sessions['nis']
+        data = db.reference("Account").child("Student/"+nis).get()
+        return render(request, self.template_name, {'student': data})
