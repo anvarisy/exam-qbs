@@ -31,5 +31,7 @@ urlpatterns = [
 
     path('account/', include(([
         path('logout', LogoutAccount.as_view(), name='logout'),
+        path('student-login', ViewLoginPage.as_view(), name='student-login'),
+        path('post-student-login', PostLoginStudent.as_view(), name='post-student-login')
     ], 'exam'), namespace='account'))
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
